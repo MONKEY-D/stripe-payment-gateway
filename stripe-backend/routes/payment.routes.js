@@ -6,10 +6,8 @@ const { createCheckoutSession } = require("../controllers/payment.controller");
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// ✅ Route to create session
 router.post("/create-checkout-session", createCheckoutSession);
 
-// ✅ Stripe webhook route
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),

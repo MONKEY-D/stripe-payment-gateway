@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import "./SubscriptionPlans.css";
 
 const plans = [
@@ -6,13 +7,13 @@ const plans = [
     name: "Basic",
     price: "₹99/mo",
     features: ["1 Project", "Email Support", "Community Access"],
-    id: "basic",
+    id: "price_1Rt1HTC6BukEWbCoSUa7Ffd5",
   },
   {
     name: "Pro",
     price: "₹199/mo",
     features: ["5 Projects", "Priority Email Support", "Community Access"],
-    id: "pro",
+    id: "price_1Rt1HkC6BukEWbCoXOzGOjfF",
   },
   {
     name: "Enterprise",
@@ -22,13 +23,28 @@ const plans = [
       "Phone & Email Support",
       "Private Slack Channel",
     ],
-    id: "enterprise",
+    id: "price_1Rt1I4C6BukEWbCo5DyUFecI",
   },
 ];
 
 const SubscriptionPlans = () => {
-  const handleSubscribe = (planId) => {
-    alert(`Subscribe to ${planId}`);
+  const handleSubscribe = async (priceId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4242/api/create-checkout-session",
+        { priceId },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Optional: send token
+          },
+        }
+      );
+
+      window.location.href = response.data.url; // redirect to Stripe Checkout
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Failed to initiate checkout.");
+    }
   };
 
   return (

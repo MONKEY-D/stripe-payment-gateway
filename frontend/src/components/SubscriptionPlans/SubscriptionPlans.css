@@ -68,3 +68,12 @@
 .subscribe-button:hover {
   background-color: #5469d4;
 }
+
+.email-input {
+  padding: 10px 16px;
+  margin-bottom: 30px;
+  width: 300px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
