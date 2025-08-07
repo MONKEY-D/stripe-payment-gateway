@@ -9,15 +9,12 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { useNavigate, Link } from "react-router-dom"; // ✅ import Link
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../store/slices/authSlice";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -26,13 +23,12 @@ export default function Login() {
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:4242/api/auth/login",
-        { email, password }
+        { email, password },
+        { withCredentials: true }
       );
-      const token = response.data.token;
-      const user = response.data.user;
-      dispatch(loginSuccess({ token, user }));
+
       alert("Login successful");
       navigate("/");
     } catch (err) {
@@ -79,8 +75,6 @@ export default function Login() {
               >
                 Login
               </Button>
-
-              {/* 👇 Register link */}
               <Typography align="center" sx={{ mt: 2 }}>
                 Don't have an account? <Link to="/register">Register here</Link>
               </Typography>

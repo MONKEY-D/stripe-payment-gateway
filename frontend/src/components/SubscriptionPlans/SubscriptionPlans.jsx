@@ -1,4 +1,3 @@
-import React from "react";
 import axios from "axios";
 import "./SubscriptionPlans.css";
 
@@ -33,17 +32,15 @@ const SubscriptionPlans = () => {
       const response = await axios.post(
         "http://localhost:4242/api/create-checkout-session",
         { priceId },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Optional: send token
-          },
-        }
+        { withCredentials: true }
       );
-
-      window.location.href = response.data.url; // redirect to Stripe Checkout
+      window.location.href = response.data.url;
     } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Failed to initiate checkout.");
+      if (error.response?.status === 401) {
+        alert("You must be logged in to subscribe.");
+      } else {
+        alert("Failed to initiate checkout.");
+      }
     }
   };
 

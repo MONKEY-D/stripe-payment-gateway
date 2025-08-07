@@ -1,17 +1,48 @@
 const express = require("express");
-const Stripe = require("stripe");
-const pool = require("../utils/db");
-const { createCheckoutSession } = require("../controllers/payment.controller");
-
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const { createCheckoutSession } = require("../controllers/payment.controller");
+const authenticateUser = require("../middleware/auth");
+const prisma = require("../utils/prisma");
 
-router.post("/create-checkout-session", createCheckoutSession);
+router.post(
+  "/create-checkout-session",
+  authenticateUser,
+  createCheckoutSession
+);
 
+
+router.get("/my-subscription", authenticateUser, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+
+    const user = await prisma.user.findUnique({
+      where: { email: userEmail },
+      include: {
+        subscriptions: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    });
+
+    if (!user || user.subscriptions.length === 0) {
+      return res.json({ plan: null });
+    }
+
+    const sub = user.subscriptions[0];
+    res.json({ plan: sub.plan, status: sub.status });
+  } catch (err) {
+    console.error("Error fetching subscription:", err.message);
+    return res.status(500).json({ error: "Failed to fetch subscription" });
+  }
+});
+
+// Stripe webhook (do not protect)
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),
   async (req, res) => {
+    const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
     const sig = req.headers["stripe-signature"];
     let event;
 
@@ -22,29 +53,43 @@ router.post(
         process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
-      console.log("Webhook error:", err.message);
+      console.error("Webhook error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     const data = event.data.object;
 
     if (event.type === "checkout.session.completed") {
-      const subscription = await stripe.subscriptions.retrieve(
-        data.subscription
-      );
-      await pool.query(
-        `UPDATE subscriptions SET subscription_id = $1, status = $2, updated_at = NOW()
-         WHERE customer_id = $3`,
-        [subscription.id, subscription.status, data.customer]
-      );
+      try {
+        const subscription = await stripe.subscriptions.retrieve(
+          data.subscription
+        );
+
+        await prisma.subscription.updateMany({
+          where: { customerId: data.customer },
+          data: {
+            subscriptionId: subscription.id,
+            status: subscription.status,
+          },
+        });
+
+        console.log("✅ Subscription updated after checkout.session.completed");
+      } catch (err) {
+        console.error("Error updating subscription:", err.message);
+      }
     }
 
     if (event.type === "invoice.paid") {
-      await pool.query(
-        `UPDATE subscriptions SET status = 'active', updated_at = NOW()
-         WHERE customer_id = $1`,
-        [data.customer]
-      );
+      try {
+        await prisma.subscription.updateMany({
+          where: { customerId: data.customer },
+          data: { status: "active" },
+        });
+
+        console.log("✅ Subscription marked active after invoice.paid");
+      } catch (err) {
+        console.error("Error updating status to active:", err.message);
+      }
     }
 
     res.json({ received: true });

@@ -9,7 +9,7 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { useNavigate, Link } from "react-router-dom"; // ✅ Import Link
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -37,13 +37,11 @@ export default function Register() {
     }
 
     try {
-      await axios.post("http://localhost:4242/api/auth/register", {
-        email,
-        firstName,
-        lastName,
-        password,
+      await axios.post("http://localhost:4242/api/auth/register", formData, {
+        withCredentials: true,
       });
-      alert("Registered successfully. Now login.");
+
+      alert("Registered successfully. Please log in.");
       navigate("/login");
     } catch (err) {
       console.error("Registration error:", err);
@@ -107,8 +105,6 @@ export default function Register() {
               >
                 Register
               </Button>
-
-              {/* 👇 Login link */}
               <Typography align="center" sx={{ mt: 2 }}>
                 Already have an account? <Link to="/login">Login here</Link>
               </Typography>
