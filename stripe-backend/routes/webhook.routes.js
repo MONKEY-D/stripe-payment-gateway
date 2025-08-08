@@ -17,7 +17,7 @@ router.post(
         process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
-      console.error("❌ Webhook signature verification failed:", err.message);
+      console.error("Webhook signature verification failed:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -39,7 +39,7 @@ router.post(
             },
           });
 
-          console.log("✅ Checkout session completed for:", data.customer);
+          console.log("Checkout session completed for:", data.customer);
           break;
         }
 
@@ -49,7 +49,7 @@ router.post(
             where: { customerId: data.customer },
             data: { status: "active" },
           });
-          console.log("✅ Invoice paid — subscription active");
+          console.log("Invoice paid — subscription active");
           break;
         }
 
@@ -58,14 +58,14 @@ router.post(
             where: { customerId: data.customer },
             data: { status: "canceled" },
           });
-          console.log("❌ Subscription canceled for:", data.customer);
+          console.log("Subscription canceled for:", data.customer);
           break;
         }
       }
 
       res.json({ received: true });
     } catch (err) {
-      console.error("❌ Error handling webhook:", err);
+      console.error("Error handling webhook:", err);
       res.status(500).send("Webhook handler failed");
     }
   }

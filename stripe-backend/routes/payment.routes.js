@@ -81,7 +81,7 @@ router.get("/my-subscription", authenticateUser, async (req, res) => {
 //           },
 //         });
 
-//         console.log("✅ Subscription updated after checkout.session.completed");
+//         console.log("Subscription updated after checkout.session.completed");
 //       } catch (err) {
 //         console.error("Error updating subscription:", err.message);
 //       }
@@ -94,7 +94,7 @@ router.get("/my-subscription", authenticateUser, async (req, res) => {
 //           data: { status: "active" },
 //         });
 
-//         console.log("✅ Subscription marked active after invoice.paid");
+//         console.log("Subscription marked active after invoice.paid");
 //       } catch (err) {
 //         console.error("Error updating status to active:", err.message);
 //       }
