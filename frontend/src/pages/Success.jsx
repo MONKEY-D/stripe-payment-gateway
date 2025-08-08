@@ -8,7 +8,7 @@ export default function Success() {
 
   useEffect(() => {
     axios
-      .get("/api/user/subscription", { withCredentials: true })
+      .get("/api/my-subscription", { withCredentials: true })
       .then((res) => setPlan(res.data.plan))
       .catch((err) => console.error(err));
   }, []);

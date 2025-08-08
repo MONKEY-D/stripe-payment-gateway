@@ -2,13 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const listEndpoints = require("express-list-endpoints");
+
 const authRoutes = require("./routes/auth.routes");
 const paymentRoutes = require("./routes/payment.routes");
-const listEndpoints = require("express-list-endpoints");
+const webhookRoutes = require("./routes/webhook.routes");
 
 const app = express();
 
-app.use("/api/webhook", require("./routes/payment.routes"));
+app.use("/api/webhook", require("./routes/webhook.routes"));
 
 app.use(
   cors({
@@ -25,5 +27,5 @@ app.use("/api", paymentRoutes);
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+  console.log(listEndpoints(app));
 });
-console.log(listEndpoints(app));
