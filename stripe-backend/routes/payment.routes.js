@@ -10,7 +10,6 @@ router.post(
   createCheckoutSession
 );
 
-
 router.get("/my-subscription", authenticateUser, async (req, res) => {
   try {
     const userEmail = req.user.email;
@@ -37,9 +36,8 @@ router.get("/my-subscription", authenticateUser, async (req, res) => {
   }
 });
 
-// Stripe webhook (do not protect)
 router.post(
-  "/webhook",
+  "/",
   express.raw({ type: "application/json" }),
   async (req, res) => {
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);

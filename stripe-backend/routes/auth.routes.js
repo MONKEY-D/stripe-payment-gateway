@@ -9,7 +9,7 @@ router.post("/login", login);
 router.post("/logout", logout);
 
 router.get("/me", authenticateUser, async (req, res) => {
-  console.log("✅ /me route hit");
+  console.log("/me route hit");
   try {
     const user = req.user;
     res.json({ id: user.userId, email: user.email });

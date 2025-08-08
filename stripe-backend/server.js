@@ -8,7 +8,7 @@ const listEndpoints = require("express-list-endpoints");
 
 const app = express();
 
-app.use("/api/webhook", express.raw({ type: "application/json" }));
+app.use("/api/webhook", require("./routes/payment.routes"));
 
 app.use(
   cors({
